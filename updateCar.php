@@ -12,7 +12,7 @@ include('config.php');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['carId'])) {
         $carId = $_POST['carId'];
-        $carName = $_POST['carName'];
+        $carName = trim(preg_replace('/\s+/', ' ', $_POST['carName']));
         $carMileage = $_POST['carMileage'];
         $carStatus = $_POST['carStatus'];
         $sql = "UPDATE dv_car SET carName = ?, carMileage = ?, carStatus = ? WHERE carId = ?";

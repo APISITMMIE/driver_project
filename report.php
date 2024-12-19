@@ -28,7 +28,7 @@ $total_records = $total_row['total'];
 $total_pages = ceil($total_records / $items_per_page);
 
 // ดึงข้อมูลรถ
-$sql_car = "SELECT * FROM dv_car";
+$sql_car = "SELECT carName FROM dv_car";
 $result_car = $conn->query($sql_car);
 ?>
 
@@ -158,7 +158,8 @@ $result_car = $conn->query($sql_car);
         <?php
         if ($result_car->num_rows > 0) {
             while ($row = $result_car->fetch_assoc()) {
-                echo '<div class="box" onclick="filterTasks(\'' . htmlspecialchars($row['carName']) . '\')">';
+                $carName = trim($row['carName']);
+                echo '<div class="box" onclick="filterTasks(\'' . addslashes(htmlspecialchars($carName)) . '\')">';
                 echo '<p>' . htmlspecialchars($row['carName']) . '</p>';
                 echo '</div>';
             }
@@ -248,7 +249,8 @@ $result_car = $conn->query($sql_car);
 
     <script>
         function filterTasks(carName) {
-            window.location.href = "?carName=" + encodeURIComponent(carName);
+            console.log("Selected carName:", carName);
+            window.location.href = "?carName=" + encodeURIComponent(carName.trim());
             document.querySelector('.left').textContent = "Car number: " + carName;
         }
     </script>
