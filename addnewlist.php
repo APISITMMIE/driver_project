@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute()) {
             $taskId = $stmt->insert_id;
-            header("Location: pin.php?taskId=$taskId");
+            header("Location: tasklist.php?taskId=$taskId");
             exit();
         } else {
             echo "Error: " . $stmt->error;

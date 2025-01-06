@@ -8,22 +8,29 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-if (isset($_GET['taskId']) && isset($_GET['pin']) && isset($_GET['end_time'])) {
+if (isset($_GET['taskId'])) {
     $taskId = $_GET['taskId'];
-    $pin = $_GET['pin']; 
-    $end_time = $_GET['end_time'];
+
+    if (isset($_SESSION['pin'])) {
+        $pin = $_SESSION['pin'];
+    } else {
+        echo "PIN not found in session!";
+        exit();
+    }
+
+    $end_time = isset($_SESSION['end_time']) ? $_SESSION['end_time'] : date("H:i:s");
+
 } else {
     echo "ไม่พบข้อมูลใน URL";
     exit();
 }
 
+// echo "Task ID: $taskId <br> Pin: $pin <br> End Time: $end_time";
+
 // echo "Task ID: " . $taskId . "<br>";
 // echo "Pin: " . $pin . "<br>";
 // echo "End Time: " . $end_time . "<br>";
 
-
-// ตรวจสอบว่า taskId นี้มีอยู่ใน authorized_task_ids หรือไม่
-// if (isset($_SESSION['authorized_task_ids']) && in_array($taskId, $_SESSION['authorized_task_ids'])) {
     $sql = "SELECT * FROM dv_tasks WHERE task_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $taskId);
@@ -46,68 +53,67 @@ if (isset($_GET['taskId']) && isset($_GET['pin']) && isset($_GET['end_time'])) {
     }
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $destinationLocation = $_POST['destinationLocation'];
-    $mileageAtDestination = $_POST['mileageAtDestination'];
+        $destinationLocation = $_POST['destinationLocation'];
+        $mileageAtDestination = $_POST['mileageAtDestination'];
+    
+        if ($mileageAtDestination < $mileage) {
+            $error_message = "เลขไมล์เมื่อถึงที่หมายไม่ควรน้อยกว่าเลขไมล์ก่อนเดินทาง";
+        } else {
+            if (empty($end_time)) {
+                $end_time = date("Y-m-d H:i:s");
+            }
+    
+            $sql_check_pin = "SELECT boss_name FROM dv_boss WHERE pin = ?";
+            $stmt_check = $conn->prepare($sql_check_pin);
+            $stmt_check->bind_param("s", $pin);
+            $stmt_check->execute();
+            $result_check = $stmt_check->get_result();
 
-    if ($mileageAtDestination < $mileage) {
-        $error_message = "เลขไมล์เมื่อถึงที่หมายไม่ควรน้อยกว่าเลขไมล์ก่อนเดินทาง";
-    } else {
-        if (empty($end_time)) {
-            $end_time = date("Y-m-d H:i:s");
-        }
+            if ($result_check->num_rows > 0) {
+                $row = $result_check->fetch_assoc();
 
-        if (isset($_FILES["destinationImage"]) && $_FILES["destinationImage"]["error"] == 0) {
-            $targetDir = "uploads/";
-            $fileExtension = pathinfo($_FILES["destinationImage"]["name"], PATHINFO_EXTENSION);
-            $newFileName = date('Y-m-d_H-i-s') . "." . $fileExtension;
-            $destinationImage = $targetDir . $newFileName;
-
-            if (move_uploaded_file($_FILES["destinationImage"]["tmp_name"], $destinationImage)) {
-                // เช็คว่า PIN ตรงกับข้อมูลในตาราง dv_boss หรือไม่
-                $sql_check_pin = "SELECT boss_name FROM dv_boss WHERE pin = ?";
-                $stmt_check = $conn->prepare($sql_check_pin);
-                $stmt_check->bind_param("s", $pin);
-                $stmt_check->execute();
-                $result_check = $stmt_check->get_result();
-
-                if ($result_check->num_rows > 0) {
-                    $row = $result_check->fetch_assoc();
-                    $carUser = $row['boss_name'];  
-                } else {
-                    $carUser = $pin;
-                }
-
-                $sql_update = "UPDATE dv_tasks SET 
-                                destination_location = ?, 
-                                mileage_at_destination = ?, 
-                                destination_image = ?, 
-                                end_time = ?, 
-                                carUser = ?, 
-                                pin = ? 
-                                WHERE task_id = ?";
-                $stmt_update = $conn->prepare($sql_update);
-                $stmt_update->bind_param("sssssii", $destinationLocation, $mileageAtDestination, $destinationImage, $end_time, $carUser, $pin, $taskId);
-
-
-                if ($stmt_update->execute()) {
-                    echo "<script>
-                            alert('บันทึกข้อมูลสำเร็จ');
-                            window.location.href = 'tasklist.php';
-                          </script>";
-                } else {
-                    echo "เกิดข้อผิดพลาดในการอัปเดตข้อมูล: " . $stmt_update->error;
-                }
+                $carUser = $row['boss_name']; 
             } else {
-                echo "ไม่สามารถอัปโหลดไฟล์ภาพได้.";
+                $carUser = $_SESSION['username'];
+            }
+
+            if (empty($carUser)) {
+
+                $carUser = $pin;
+            }
+
+    
+            if (isset($_FILES["destinationImage"]) && $_FILES["destinationImage"]["error"] == 0) {
+                $targetDir = "uploads/";
+                $fileExtension = pathinfo($_FILES["destinationImage"]["name"], PATHINFO_EXTENSION);
+                $newFileName = date('Y-m-d_H-i-s') . "." . $fileExtension;
+                $destinationImage = $targetDir . $newFileName;
+    
+                if (move_uploaded_file($_FILES["destinationImage"]["tmp_name"], $destinationImage)) {
+                    $sql_update = "UPDATE dv_tasks SET 
+                                    destination_location = ?, 
+                                    mileage_at_destination = ?, 
+                                    destination_image = ?, 
+                                    end_time = ?,
+                                    pin = ? 
+                                    WHERE task_id = ?";
+                    $stmt_update = $conn->prepare($sql_update);
+                    $stmt_update->bind_param("ssssii", $destinationLocation, $mileageAtDestination, $destinationImage, $end_time, $pin, $taskId);
+    
+                    if ($stmt_update->execute()) {
+                        echo "<script>
+                                alert('บันทึกข้อมูลสำเร็จ');
+                                window.location.href = 'tasklist.php';
+                              </script>";
+                    } else {
+                        echo "เกิดข้อผิดพลาดในการอัปเดตข้อมูล: " . $stmt_update->error;
+                    }
+                } else {
+                    echo "ไม่สามารถอัปโหลดไฟล์ภาพได้.";
+                }
             }
         }
     }
-}
-// } else {
-//     echo "ไม่สามารถเข้าถึง Task นี้ได้ กรุณากรอก PIN";
-//     header("Location: pin.php?taskId=$taskId");
-//     exit();
-// }
 
     // ดึงข้อมูลชื่อคนขับและทะเบียนรถ
     if (isset($_SESSION['username'])) {
@@ -261,7 +267,7 @@ if (isset($_GET['taskId']) && isset($_GET['pin']) && isset($_GET['end_time'])) {
         <input type="number" id="mileageAtDestination" name="mileageAtDestination" max="999999" placeholder="กรุณากรอกเลขไมล์" required>
 
         <label for="destinationLocation">สถานที่ปลายทาง</label>
-        <input type="text" id="destinationLocation" name="destinationLocation" placeholder="กรุณารอกสถานที่ปลายทาง" required>
+        <input type="text" id="destinationLocation" name="destinationLocation" placeholder="กรุณากรอกสถานที่ปลายทาง" required>
 
         <label for="destinationImage">ถ่ายรูปเลขไมล์เมื่อถึงที่หมาย</label>
         <input type="file" id="destinationImage" name="destinationImage" accept="image/*" capture="camera" required>

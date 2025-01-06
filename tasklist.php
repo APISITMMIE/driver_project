@@ -1,13 +1,23 @@
 <?php
 session_start();
 date_default_timezone_set('Asia/Bangkok');
+include('config.php');
 
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
 }
 
-include('config.php');
+if (isset($_GET['taskId'])) {
+    $taskId = $_GET['taskId'];
+}
+
+if (isset($_SESSION['pin'])) {
+
+    $pin = $_SESSION['pin'];
+} else {
+    $pin = "No PIN set";
+}
 
 $rowsPerPage = 25;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -36,17 +46,6 @@ $row = $countResult->fetch_assoc();
 $totalRows = $row['total'];
 $totalPages = ceil($totalRows / $rowsPerPage);
 
-if (isset($_GET['taskId'])) {
-    $taskId = $_GET['taskId'];
-
-    if (isset($_SESSION['authorized_task_ids']) && in_array($taskId, $_SESSION['authorized_task_ids'])) {
-        header("Location: destination.php?taskId=$taskId");
-        exit;
-    } else {
-        header("Location: pin.php?taskId=$taskId");
-        exit;
-    }
-}
 ?>
 
 
@@ -178,16 +177,23 @@ if (isset($_GET['taskId'])) {
                 });
             });
 
-            $(window).click(function(event) {
-                if (event.target == document.getElementById("taskDetailModal")) {
-                    $("#taskDetailModal").hide(); 
-                }
-            });
-
             $("#approveBtn").click(function() {
                 var taskId = $("#taskDetailModal").data('task-id'); 
                 if (taskId) {
-                    window.location.href = "pin.php?taskId=" + taskId;
+                    $.ajax({
+                        url: 'check_pin_session.php', 
+                        type: 'GET',
+                        success: function(response) {
+                            if (response.trim() === "has_pin") {
+                                window.location.href = "destination.php?taskId=" + taskId;
+                            } else {
+                                window.location.href = "pin.php?taskId=" + taskId;
+                            }
+                        },
+                        error: function() {
+                            alert("An error occurred while checking the PIN session.");
+                        }
+                    });
                 } else {
                     alert("ไม่พบ taskId");
                 }

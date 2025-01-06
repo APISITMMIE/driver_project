@@ -11,9 +11,7 @@ if (isset($_GET['taskId'])) {
     $taskId = $_GET['taskId'];
 }
 
-
 ?>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -180,30 +178,38 @@ if (isset($_GET['taskId'])) {
                     data: { pin: pinEntered, taskId: <?php echo $taskId; ?> },
                     success: function(response) {
                         let [type, value] = response.trim().split('|');
-                        if (type === "boss") {
+                        if (type === "boss" || type === "user" || type === "pin") {
                             Swal.fire({
-                                title: `Are you ${value}?`,
+                                title: `Are you : ${value}?`,
                                 icon: 'question',
                                 showCancelButton: true,
                                 confirmButtonText: 'Yes',
                                 cancelButtonText: 'No',
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    proceedToNextPage(pinEntered);
-                                } else {
-                                    pinInput.value = ""; 
-                                }
-                            });
-                        } else if (type === "pin") {
-                            Swal.fire({
-                                title: `Are you ${value}?`,
-                                icon: 'question',
-                                showCancelButton: true,
-                                confirmButtonText: 'Yes',
-                                cancelButtonText: 'No',
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    proceedToNextPage(pinEntered);
+                                    $.ajax({
+                                        url: 'save_pin.php',
+                                        type: 'POST',
+                                        data: { pin: pinEntered },
+                                        success: function(saveResponse) {
+                                            if (saveResponse.trim() === "success") {
+                                                proceedToNextPage(pinEntered);
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Error',
+                                                    text: 'Failed to save PIN. Please try again.',
+                                                });
+                                            }
+                                        },
+                                        error: function() {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error',
+                                                text: 'An error occurred while saving the PIN.',
+                                            });
+                                        }
+                                    });
                                 } else {
                                     pinInput.value = ""; 
                                 }

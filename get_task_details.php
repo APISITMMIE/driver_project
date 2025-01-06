@@ -1,4 +1,5 @@
 <?php
+session_start();
 include('config.php');
 
 if (isset($_GET['task_id'])) {
@@ -58,7 +59,7 @@ if (isset($_GET['task_id'])) {
                         <h6>Driver</h6>
                 </div>
                 <div class='headinside'>
-                    <p>Form</p>
+                    <p>From</p>
                     <p> > </p>
                     <p>To</p>
                 </div>
@@ -205,24 +206,26 @@ if (isset($_GET['task_id'])) {
         justify-content: space-around;
         align-items: center;
         width: 80%;
-        margin-top: 20px;
+        margin-top: 40px;
         margin-left: 40px;
-        margin-bottom: 60px;
+        margin-bottom: 40px;
     }
 
     /* แสดงรูปภาพ */
     .user-profile {
         text-align: center;
         position: absolute;
+        margin-bottom: 0;
     }
 
     .user-profile img {
         border-radius: 50%;
-        margin-bottom: 5px;
+        margin-bottom: 0;
     }
 
     .user-profile p {
-        font-size: 1rem;
+
+        font-size: 0.8rem;
         font-weight: bold;
     }
 

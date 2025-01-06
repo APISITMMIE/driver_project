@@ -23,13 +23,33 @@ if (isset($_POST['pin'])) {
 
         echo "boss|$bossName";
     } else {
-        $taskId = $_POST['taskId'];
-        $updateSql = "UPDATE dv_tasks SET carUser = ?, pin = ? WHERE task_id = ?";
-        $updateStmt = $conn->prepare($updateSql);
-        $updateStmt->bind_param("ssi", $pin, $pin, $taskId);
-        $updateStmt->execute();
+        $sqlUser = "SELECT username FROM dv_users WHERE pin = ?";
+        $stmtUser = $conn->prepare($sqlUser);
+        $stmtUser->bind_param("s", $pin);
+        $stmtUser->execute();
+        $resultUser = $stmtUser->get_result();
 
-        echo "pin|$pin";
+        if ($resultUser->num_rows > 0) {
+            $rowUser = $resultUser->fetch_assoc();
+            $userName = $rowUser['username'];
+            $taskId = $_POST['taskId'];
+
+            $updateSql = "UPDATE dv_tasks SET carUser = ?, pin = ? WHERE task_id = ?";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->bind_param("ssi", $userName, $pin, $taskId);
+            $updateStmt->execute();
+
+            echo "user|$userName";
+        } else {
+
+            $taskId = $_POST['taskId'];
+            $updateSql = "UPDATE dv_tasks SET carUser = ?, pin = ? WHERE task_id = ?";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->bind_param("ssi", $pin, $pin, $taskId);
+            $updateStmt->execute();
+
+            echo "pin|$pin";
+        }
     }
 } else {
     echo "fail";
