@@ -21,6 +21,7 @@ if (isset($_POST['pin'])) {
         $updateStmt->bind_param("ssi", $bossName, $pin, $taskId);
         $updateStmt->execute();
 
+        $_SESSION['pin'] = $pin;
         echo "boss|$bossName";
     } else {
         $sqlUser = "SELECT username FROM dv_users WHERE pin = ?";
@@ -39,6 +40,7 @@ if (isset($_POST['pin'])) {
             $updateStmt->bind_param("ssi", $userName, $pin, $taskId);
             $updateStmt->execute();
 
+            $_SESSION['pin'] = $pin;
             echo "user|$userName";
         } else {
 
@@ -48,6 +50,7 @@ if (isset($_POST['pin'])) {
             $updateStmt->bind_param("ssi", $pin, $pin, $taskId);
             $updateStmt->execute();
 
+            $_SESSION['pin'] = $pin;
             echo "pin|$pin";
         }
     }

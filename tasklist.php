@@ -1,4 +1,6 @@
 <?php
+ini_set('session.gc_maxlifetime', 1800); 
+session_set_cookie_params(1800); 
 session_start();
 date_default_timezone_set('Asia/Bangkok');
 include('config.php');
@@ -6,17 +8,6 @@ include('config.php');
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
-}
-
-if (isset($_GET['taskId'])) {
-    $taskId = $_GET['taskId'];
-}
-
-if (isset($_SESSION['pin'])) {
-
-    $pin = $_SESSION['pin'];
-} else {
-    $pin = "No PIN set";
 }
 
 $rowsPerPage = 25;
@@ -71,7 +62,10 @@ $totalPages = ceil($totalRows / $rowsPerPage);
             <button class="new-button" onclick="location.href='addnewlist.php'">New</button>
         </div>
         <div>
-            <span>Welcome, <?php echo $_SESSION['username']; ?></span>      
+            <span><?php echo $_SESSION['username']; ?></span> 
+            <a href="driver_OT.php">
+                <button class="ot-button">OT</button> 
+            </a>     
             <a href="logout.php">
                 <button class="logout-button">Logout</button> 
             </a>
@@ -178,24 +172,30 @@ $totalPages = ceil($totalRows / $rowsPerPage);
             });
 
             $("#approveBtn").click(function() {
-                var taskId = $("#taskDetailModal").data('task-id'); 
+                var taskId = $("#taskDetailModal").data('task-id');
                 if (taskId) {
                     $.ajax({
                         url: 'check_pin_session.php', 
                         type: 'GET',
                         success: function(response) {
-                            if (response.trim() === "has_pin") {
+                            if (response === 'has_pin') {
                                 window.location.href = "destination.php?taskId=" + taskId;
                             } else {
                                 window.location.href = "pin.php?taskId=" + taskId;
                             }
                         },
-                        error: function() {
-                            alert("An error occurred while checking the PIN session.");
+                        error: function(xhr, status, error) {
+                            alert("An error occurred while checking the pin session. Please try again.");
                         }
                     });
                 } else {
-                    alert("ไม่พบ taskId");
+                    alert("ไม่พบ Task ID");
+                }
+            });
+
+            $(window).click(function(event) {
+                if (event.target == document.getElementById("taskDetailModal")) {
+                    $("#taskDetailModal").hide(); 
                 }
             });
         });

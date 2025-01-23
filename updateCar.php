@@ -69,9 +69,13 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แก้ไขข้อมูลรถ</title>
-    <link rel="stylesheet" href="layout/adminUser.css">
+    <link rel="stylesheet" href="layout/adminCar.css">
     <style>
         .table-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             width: 80%;
             margin: 30px auto;
             background-color: #f4f4f4;
@@ -88,7 +92,7 @@ if (isset($_GET['id'])) {
             margin-bottom: 20px;
         }
         form {
-            max-width: 600px;
+            width: 35%;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
@@ -152,6 +156,24 @@ if (isset($_GET['id'])) {
             box-sizing: border-box;
         }
 
+        .back-btn {
+            margin-top: 20px;
+            width: 35%;
+            padding: 12px;
+            background-color: transparent;
+            color: #929191;
+            padding: 12px 20px;
+            border: 1px solid #929191 ;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .back-btn:hover {
+            background-color: #929191;
+            color: white;
+        }
+
         /* responsive */
         @media (max-width: 600px) {
             .table-container {
@@ -188,7 +210,11 @@ if (isset($_GET['id'])) {
             <li><a href="admin.php">Dashboard</a></li>
             <li><a href="adminUser.php">Manage Users</a></li>
             <li><a href="adminCar.php">Manage Cars</a></li>
-            <li><a href="#">Reports</a></li>
+            <li><a href="adminBoss.php">Manage Boss</a></li>
+            <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
     </div>
 
@@ -214,6 +240,7 @@ if (isset($_GET['id'])) {
 
             <input type="submit" value="อัปเดตข้อมูล">
         </form>
+        <button onclick="history.back()" class="back-btn">Back</button>
     </div>
 
 </body>

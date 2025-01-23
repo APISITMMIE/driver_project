@@ -40,6 +40,9 @@ $result = $conn->query($sql);
             <li><a href="adminCar.php">Manage Cars</a></li>
             <li><a href="adminBoss.php">Manage Boss</a></li>
             <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
     </div>
 
@@ -53,8 +56,9 @@ $result = $conn->query($sql);
             <table style="user-select: none;">
                 <thead>
                     <tr>
-                        <th style="width: 40%;">ชื่อผู้ใช้</th>
-                        <th style="width: 40%;">รหัสผ่าน</th>
+                        <th style="width: 30%;">ชื่อผู้ใช้</th>
+                        <th style="width: 30%;">รหัสผ่าน</th>
+                        <th style="width: 20%;">PIN</th>
                         <th>การจัดการ</th>
                     </tr>
                 </thead>
@@ -66,6 +70,7 @@ $result = $conn->query($sql);
                             <tr>
                                 <td>" . ($row["username"]) . "</td>
                                 <td>" . ($row["password"]) . "</td>
+                                <td>" . ($row['pin']) . "</td>
                                 <td>
                                     <a class='btn-edit' href='updateUser.php?id=" . ($row['user_id']) . "'>Edit</a> &nbsp;
                                     <a class='btn-delete' href='deleteUser.php?id=" . ($row['user_id']) . "' onclick='return confirmDelete()'>Delete</a>

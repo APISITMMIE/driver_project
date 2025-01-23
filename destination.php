@@ -10,26 +10,26 @@ if (!isset($_SESSION['username'])) {
 
 if (isset($_GET['taskId'])) {
     $taskId = $_GET['taskId'];
+}else {
+    echo " URL มาไม่ครบ";
+}
+    
+$end_time = isset($_SESSION['end_time']) ? $_SESSION['end_time'] : date("H:i:s");
 
-    if (isset($_SESSION['pin'])) {
-        $pin = $_SESSION['pin'];
-    } else {
-        echo "PIN not found in session!";
-        exit();
-    }
-
-    $end_time = isset($_SESSION['end_time']) ? $_SESSION['end_time'] : date("H:i:s");
-
-} else {
-    echo "ไม่พบข้อมูลใน URL";
+if (!isset($_SESSION['pin'])) {
+    echo "<script>
+            alert('กรุณาป้อน PIN ');
+            window.location.href = 'pin.php';
+          </script>";
     exit();
 }
 
 // echo "Task ID: $taskId <br> Pin: $pin <br> End Time: $end_time";
-
 // echo "Task ID: " . $taskId . "<br>";
-// echo "Pin: " . $pin . "<br>";
+//  echo "Pin: " . $pin . "<br>";
 // echo "End Time: " . $end_time . "<br>";
+// echo "Latitude : " . $latitude . "<br>";
+// echo "Latitude : " . $longitude . "<br>";
 
     $sql = "SELECT * FROM dv_tasks WHERE task_id = ?";
     $stmt = $conn->prepare($sql);
@@ -55,7 +55,9 @@ if (isset($_GET['taskId'])) {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $destinationLocation = $_POST['destinationLocation'];
         $mileageAtDestination = $_POST['mileageAtDestination'];
-    
+        $Allowance = isset($_POST['Allowance']) && $_POST['Allowance'] !== '' ? $_POST['Allowance'] : null;
+        $risk_allowance = isset($_POST['risk_allowance']) && $_POST['risk_allowance'] !== '' ? $_POST['risk_allowance'] : null;
+
         if ($mileageAtDestination < $mileage) {
             $error_message = "เลขไมล์เมื่อถึงที่หมายไม่ควรน้อยกว่าเลขไมล์ก่อนเดินทาง";
         } else {
@@ -82,7 +84,6 @@ if (isset($_GET['taskId'])) {
                 $carUser = $pin;
             }
 
-    
             if (isset($_FILES["destinationImage"]) && $_FILES["destinationImage"]["error"] == 0) {
                 $targetDir = "uploads/";
                 $fileExtension = pathinfo($_FILES["destinationImage"]["name"], PATHINFO_EXTENSION);
@@ -95,12 +96,15 @@ if (isset($_GET['taskId'])) {
                                     mileage_at_destination = ?, 
                                     destination_image = ?, 
                                     end_time = ?,
-                                    pin = ? 
+                                    allowance = ?, 
+                                    risk_allowance = ?
                                     WHERE task_id = ?";
                     $stmt_update = $conn->prepare($sql_update);
-                    $stmt_update->bind_param("ssssii", $destinationLocation, $mileageAtDestination, $destinationImage, $end_time, $pin, $taskId);
+                    $stmt_update->bind_param("ssssssi", $destinationLocation, $mileageAtDestination, $destinationImage, $end_time, $Allowance, $risk_allowance, $taskId);
     
                     if ($stmt_update->execute()) {
+                        // เคลียร์ session 
+                        unset($_SESSION['pin'], $_SESSION['end_time']);
                         echo "<script>
                                 alert('บันทึกข้อมูลสำเร็จ');
                                 window.location.href = 'tasklist.php';
@@ -134,7 +138,7 @@ if (isset($_GET['taskId'])) {
         $driverName = ''; 
         $carName = '';
         $carId = '';
-    }
+    } 
 ?>
 
 <!DOCTYPE html>
@@ -223,6 +227,12 @@ if (isset($_GET['taskId'])) {
         #driverName , #carName, #mileage, #location {
             background-color: #b6bbbb;
         }
+
+        /* allowance */
+        .textbox-container {
+            display: none;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -269,9 +279,24 @@ if (isset($_GET['taskId'])) {
         <label for="destinationLocation">สถานที่ปลายทาง</label>
         <input type="text" id="destinationLocation" name="destinationLocation" placeholder="กรุณากรอกสถานที่ปลายทาง" required>
 
+        <!-- <label>
+            <input type="checkbox" onclick="toggleTextbox(this, 'Allowance')">
+                Allowance
+        </label>
+        <div id="Allowance" class="textbox-container" style="display: none;">
+            <input type="text" name="Allowance" placeholder="กรอก Allowance">
+        </div>
+
+        <label>
+            <input type="checkbox" onclick="toggleTextbox(this, 'risk_allowance')">
+            Risk-allowance
+        </label>
+        <div id="risk_allowance" class="textbox-container" style="display: none;">
+            <input type="text" name="risk_allowance" placeholder="กรอก Risk-allowance">
+        </div> -->
+
         <label for="destinationImage">ถ่ายรูปเลขไมล์เมื่อถึงที่หมาย</label>
         <input type="file" id="destinationImage" name="destinationImage" accept="image/*" capture="camera" required>
-        
         
         <div class="image-preview" id="imagePreview2"></div>
         <input type="hidden" name="taskId" value="<?php echo isset($taskId) ? $taskId : ''; ?>"><br>
@@ -282,6 +307,7 @@ if (isset($_GET['taskId'])) {
 </div>
 
 <script>
+
     document.getElementById("destinationImage").addEventListener("change", function(event) {
         const file = event.target.files[0];
         if (file) {
@@ -298,7 +324,6 @@ if (isset($_GET['taskId'])) {
     const mileageAtDestination = document.getElementById("mileageAtDestination").value;
     const mileage = <?php echo $mileage; ?>;  
 
-    // ตรวจสอบว่าเลขไมล์ปลายทางมากกว่าหรือเท่ากับเลขไมล์ก่อนเดินทาง
         if (mileageAtDestination < mileage) {
             event.preventDefault(); 
             document.getElementById("mileageError").style.display = "inline";  
@@ -306,6 +331,11 @@ if (isset($_GET['taskId'])) {
             document.getElementById("mileageError").style.display = "none";  
         }
     };
+
+    function toggleTextbox(checkbox, textboxId) {
+        const textboxContainer = document.getElementById(textboxId);
+        textboxContainer.style.display = checkbox.checked ? "block" : "none";
+    }
 </script>
 
 </body>

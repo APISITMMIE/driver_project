@@ -15,7 +15,8 @@ header {
     padding: 10px 50px;
     background-color: #333;
     color: white;
-    width: 94vw;
+    width: 100%;
+    box-sizing: border-box;  
 }
 
 header .logo img {
@@ -62,36 +63,46 @@ header .logout-btn:hover {
 
 /* Sidebar Styles */
 .sidebar {
-    font-family: 'Noto Sans Thai', sans-serif;
     width: 11vw;
     background-color: #333;
     color: white;
     padding-top: 20px;
-    margin-top: 0;
-    height: 90vh;   
-    position: fixed;
+    margin-bottom: 0;
+    height: 170vh;
+    position: absolute;
+    transition: all 0.3s ease;
 }
 
 .sidebar ul {
     list-style: none;
-}
-
-ul {
     padding: 0;
 }
 
 .sidebar ul li {
-    padding: 15px 30px;
+    padding: 12px 20px;
 }
 
 .sidebar ul li a {
     color: white;
     text-decoration: none;
     display: block;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
-.sidebar ul li a:hover {
-    background-color: #444;
+.sidebar ul li a:hover,
+.sidebar ul li a:focus {
+    transform: scale(1.05);
+    font-size: 18px;
+}
+
+.sidebar ul li:nth-child(1) a {
+    background-color: #053ec9;
+    width: 85%;
+    font-size: 18px;
 }
 
 /* Box for Driver and Car Form */
@@ -259,6 +270,10 @@ td {
 
     .table-container {
         width: 85%;
+    }
+
+    .sidebar {
+        display: none;
     }
 }
 

@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-if (isset($_SESSION['pin']) && !empty($_SESSION['pin'])) {
-    echo "has_pin";  
+if (isset($_SESSION['pin'])) {
+    echo 'has_pin';
 } else {
-    echo "no_pin";  
+    echo 'no_pin';
 }
 ?>

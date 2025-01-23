@@ -45,6 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         /* ฟอร์มการเพิ่มข้อมูลรถ */
         .table-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             width: 80%;
             margin-left: 15%;
             margin-top: 30px;
@@ -62,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         form {
-            max-width: 600px;
+            width: 35%;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
@@ -118,6 +122,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-sizing: border-box;
         }
 
+        .back-btn {
+            margin-top: 20px;
+            width: 35%;
+            padding: 12px;
+            background-color: transparent;
+            color: #929191;
+            padding: 12px 20px;
+            border: 1px solid #929191 ;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .back-btn:hover {
+            background-color: #929191;
+            color: white;
+        }
+
         /* responsive */
         @media (max-width: 600px) {
             .table-container {
@@ -156,6 +178,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li><a href="adminCar.php">Manage Cars</a></li>
             <li><a href="adminBoss.php">Manage Boss</a></li>
             <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
     </div>
 
@@ -179,6 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <input type="submit" value="เพิ่มข้อมูล">
         </form>
+        <button onclick="history.back()" class="back-btn">Go Back</button>
     </div>
 </body>
 </html>

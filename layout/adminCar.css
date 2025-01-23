@@ -100,7 +100,7 @@
     font-size: 18px;
 }
 
-.sidebar ul li:nth-child(2) a {
+.sidebar ul li:nth-child(3) a {
     background-color: #053ec9;
     width: 85%;
 }
@@ -199,6 +199,7 @@
         font-size: 16px;
         color: red;
     }
+
 
     /* Media Queries: Responsive Design */
     @media screen and (max-width: 768px) {

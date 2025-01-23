@@ -80,6 +80,15 @@ $result_car = $conn->query($sql_car);
         .box:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            border-color: #007bff; 
+            background-color: transparent; 
+        }
+        .box.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+            border-color: #007bff;
+            background-color: #007bff;
+            color: white;
         }
         .table-container {
             width: 100%;
@@ -159,7 +168,8 @@ $result_car = $conn->query($sql_car);
         if ($result_car->num_rows > 0) {
             while ($row = $result_car->fetch_assoc()) {
                 $carName = trim($row['carName']);
-                echo '<div class="box" onclick="filterTasks(\'' . addslashes(htmlspecialchars($carName)) . '\')">';
+                $activeClass = ($carName === $carNameFilter) ? 'active': '';
+                echo '<div class="box ' . $activeClass . '" onclick="filterTasks(\'' . addslashes(htmlspecialchars($carName)) . '\')">';
                 echo '<p>' . htmlspecialchars($row['carName']) . '</p>';
                 echo '</div>';
             }
@@ -190,36 +200,38 @@ $result_car = $conn->query($sql_car);
                     <th>Private/Official</th>
                     <th>จุดประสงค์ในการเดินทาง</th>
                     <th>คนขับรถ</th>
-                    <th>ทะเบียนรถ</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $totalDistance = '-';
-                        if ($row['mileage_at_destination'] && $row['mileage']) {
-                            $totalDistance = $row['mileage_at_destination'] - $row['mileage'];
-                        }
+                if (empty($carNameFilter)) {
+                    echo "<tr><td colspan='11' style='font-size: 20px;'>กรุณาเลือกรถที่ต้องการดูข้อมูล</td></tr>";
+                }else {
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $totalDistance = '-';
+                            if ($row['mileage_at_destination'] && $row['mileage']) {
+                                $totalDistance = $row['mileage_at_destination'] - $row['mileage'];
+                            }
 
-                        echo "
-                        <tr>
-                            <td>" . ($row["start_date"] ? date("d-m-y", strtotime($row["start_date"])) : '-') . "</td>
-                            <td>" . $row["location"] . "</td>
-                            <td>" . ($row["start_time"] ? date("H:i", strtotime($row["start_time"])) : '-') . "</td>
-                            <td>" . $row["mileage"] . "</td>
-                            <td>" . $row["destination_location"] . "</td>
-                            <td>" . ($row["end_time"] ? date("H:i", strtotime($row["end_time"])) : '-') . "</td>
-                            <td>" . $row["mileage_at_destination"] . "</td>
-                            <td>" . $totalDistance . "</td>
-                            <td>" . $row["accessories"] . "</td>
-                            <td>" . $row["trip_types"] . "</td>
-                            <td>" . $row["driver_name"] . "</td>
-                            <td>" . $row["carName"] . "</td>
-                        </tr>";
+                            echo "
+                            <tr>
+                                <td>" . ($row["start_date"] ? date("d-m-y", strtotime($row["start_date"])) : '-') . "</td>
+                                <td>" . $row["location"] . "</td>
+                                <td>" . ($row["start_time"] ? date("H:i", strtotime($row["start_time"])) : '-') . "</td>
+                                <td>" . $row["mileage"] . "</td>
+                                <td>" . $row["destination_location"] . "</td>
+                                <td>" . ($row["end_time"] ? date("H:i", strtotime($row["end_time"])) : '-') . "</td>
+                                <td>" . $row["mileage_at_destination"] . "</td>
+                                <td>" . $totalDistance . "</td>
+                                <td>" . $row["accessories"] . "</td>
+                                <td>" . $row["trip_types"] . "</td>
+                                <td>" . $row["driver_name"] . "</td>
+                            </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='11'>ไม่มีข้อมูล</td></tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='12'>ไม่มีข้อมูล</td></tr>";
                 }
                 ?>
             </tbody>

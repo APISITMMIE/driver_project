@@ -18,6 +18,8 @@ if (isset($_GET['task_id'])) {
                 t.destination_image,
                 t.accessories,
                 t.trip_types,
+                t.allowance,
+                t.risk_allowance,
                 u.username,
                 u.profile_image
             FROM dv_tasks t
@@ -79,6 +81,13 @@ if (isset($_GET['task_id'])) {
                 </div>
             </div>
             
+            <div class='other'>
+                <p><strong>" . ($row["allowance"] ? "Allowance : " . $row["allowance"] : '') . "</strong></p>
+            </div>
+            <div class='other'>
+                <p><strong>" . ($row["risk_allowance"] ? "Risk Allowance : " . $row["risk_allowance"] : '') . "</strong></p>
+            </div>
+
             <div class='total-distance'>
                 <h6>Total Distance</h6> <p><strong>" . ($totalDistance === '-' ? $totalDistance : number_format($totalDistance)) . " km</strong></p>
             </div>
@@ -233,6 +242,23 @@ if (isset($_GET['task_id'])) {
         font-size: 12px;
     }
  
+    .other{
+        margin-top: 8px;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .total-distance h6 {
+        font-size: 16px;
+        color: gray;
+    }
+
+    .total-distance p {
+        font-size: 2rem;
+        font-weight: bold;
+    }
  
 </style>
 </head>

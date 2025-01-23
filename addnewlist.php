@@ -27,12 +27,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timestamp = date('Y-m-d_H-i-s');
     $driverImage = $targetDir . $timestamp . "." . $imageExtension;
 
+    $latitude = $_POST['latitude']; // รับค่า latitude
+    $longitude = $_POST['longitude']; // รับค่า longitude
+
     if (move_uploaded_file($_FILES["driverImage"]["tmp_name"], $driverImage)) {
-        $sql = "INSERT INTO dv_tasks (driver_name, carName, mileage, location, start_date, start_time, driver_image, accessories, trip_types)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO dv_tasks (driver_name, carName, mileage, location, start_date, start_time, driver_image, accessories, trip_types, latitude, longitude)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssssss", $driverName, $carName, $mileage, $location, $start_date, $start_time, $driverImage, $accessories, $tripTypes);
+        $stmt->bind_param("sssssssssdd", $driverName, $carName, $mileage, $location, $start_date, $start_time, $driverImage, $accessories, $tripTypes, $latitude, $longitude);
 
         if ($stmt->execute()) {
             $taskId = $stmt->insert_id;
@@ -235,6 +238,9 @@ $conn->close();
             <label for="location">สถานที่ต้นทาง</label>
             <input type="text" id="location" name="location" placeholder="กรุณารอกสถานที่ต้นทาง" required>
 
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
             <div class="radio-group">
                 <label>Private/Official:</label>
                 <div>
@@ -275,6 +281,49 @@ $conn->close();
                 reader.readAsDataURL(file); 
             }
         });
+
+        // เก็บค่า Latitude และ Longitude
+        document.querySelector("form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            getLocation();
+        });
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            document.getElementById("latitude").value = latitude;
+            document.getElementById("longitude").value = longitude;
+
+            document.querySelector("form").submit();
+        }
+
+        function showError(error) {
+            let errorMessage = "";
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = "An unknown error occurred.";
+                    break;
+            }
+            alert(errorMessage);
+        }
 
     </script>
 </body>

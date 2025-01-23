@@ -53,15 +53,18 @@ $result_car = $conn->query($sql_car);
     </header>
 
     <!-- Sidebar Section -->
-    <aside class="sidebar">
+    <div class="sidebar">
         <ul>
             <li><a href="admin.php">Dashboard</a></li>
             <li><a href="adminUser.php">Manage Users</a></li>
             <li><a href="adminCar.php">Manage Cars</a></li>
             <li><a href="adminBoss.php">Manage Boss</a></li>
             <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
-    </aside>
+    </div>
 
     <!-- Main -->
     <div class="box">
@@ -102,75 +105,79 @@ $result_car = $conn->query($sql_car);
 
     <!-- Show Connection -->
      <div class="showConnect">
-            <h2>ประวัติการใช้งานรถ</h2>
-            <table style="user-select: none;">
-                <thead>
-                    <tr>
-                        <th>ชื่อคนขับรถ</th>
-                        <th>ทะเบียนรถ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                        $sql_show_linked = "
-                        SELECT u.username, c.carName
-                        FROM dv_driver_car dc
-                        JOIN dv_users u ON dc.driver_id = u.user_id
-                        JOIN dv_car c ON dc.car_id = c.carId
-                    ";
-                    $result_linked = $conn->query($sql_show_linked);
-                    
-                    if ($result_linked->num_rows > 0) {
-                        while ($row = $result_linked->fetch_assoc()) {
-                            echo "
-                            <tr>
-                                <td>" . $row['username'] . "</td>
-                                <td>" . $row['carName'] . "</td>
-                            </tr>    
-                            ";
-                        }
-                    } else {
-                        echo "<tr><td colspan='2>ไม่มีข้อมูล</td></tr>";
+        <h2>ประวัติการใช้งานรถ</h2>
+        <table style="user-select: none;">
+            <thead>
+                <tr>
+                    <th>ชื่อคนขับรถ</th>
+                    <th>ทะเบียนรถ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                    $sql_show_linked = "
+                    SELECT u.username, c.carName
+                    FROM dv_driver_car dc
+                    JOIN dv_users u ON dc.driver_id = u.user_id
+                    JOIN dv_car c ON dc.car_id = c.carId
+                ";
+                $result_linked = $conn->query($sql_show_linked);
+                
+                if ($result_linked->num_rows > 0) {
+                    while ($row = $result_linked->fetch_assoc()) {
+                        echo "
+                        <tr>
+                            <td>" . $row['username'] . "</td>
+                            <td>" . $row['carName'] . "</td>
+                        </tr>    
+                        ";
                     }
-                    
-                    ?>
-                </tbody>
-            </table>
-        </div>         
+                } else {
+                    echo "<tr><td colspan='2>ไม่มีข้อมูล</td></tr>";
+                }
+                
+                ?>
+            </tbody>
+        </table>
+    </div>         
 </div>
 <!-- end box -->
-        <div class="table-container">
-            <h2>ข้อมูลรถทั้งหมด</h2>
-            <table style="user-select: none;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>ยี่ห้อ + เลขทะเบียน</th>
-                        <th>เลขไมล์ล่าสุด</th>
-                        <th>สถานะ</th>
-                    </tr>
-                </thead>
-                <tbody id="carBody">
-                    <?php
-                    if ($result_show->num_rows > 0) {
-                        while ($row = $result_show->fetch_assoc()) {
-                            $statusText = $row['carStatus'] == 1 ? "พร้อมใช้งาน" : "ไม่พร้อมใช้งาน";
-                            echo "
-                            <tr>
-                                <td>" . ($row["carId"]) . "</td>
-                                <td>" . ($row["carName"]) . "</td>
-                                <td>" . ($row["carMileage"]) . "</td>
-                                <td>" . $statusText . "</td>
-                            </tr>
-                            ";
+    <div class="table-container">
+        <h2>ข้อมูลรถทั้งหมด</h2>
+        <table style="user-select: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ยี่ห้อ + เลขทะเบียน</th>
+                    <th>เลขไมล์ล่าสุด</th>
+                    <th>สถานะ</th>
+                </tr>
+            </thead>
+            <tbody id="carBody">
+                <?php
+                if ($result_show->num_rows > 0) {
+                    while ($row = $result_show->fetch_assoc()) {
+                        if ($row['carStatus'] == 1) {
+                            $statusText = "<span style='color: green;'>พร้อมใช้งาน</span>"; 
+                        }else {
+                            $statusText = "<span style='color: red;'>ไม่พร้อมใช้งาน</span>";
                         }
-                    } else {
-                        echo "<tr><td colspan='4>ไม่มีข้อมูล</td></tr>";
+                        echo "
+                        <tr>
+                            <td>" . ($row["carId"]) . "</td>
+                            <td>" . ($row["carName"]) . "</td>
+                            <td>" . ($row["carMileage"]) . "</td>
+                            <td>" . $statusText . "</td>
+                        </tr>
+                        ";
                     }
-                    ?>
-                </tbody>
-            </table>
-        </div>
+                } else {
+                    echo "<tr><td colspan='4>ไม่มีข้อมูล</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
     
 </body>
 </html>

@@ -69,7 +69,7 @@
     color: white;
     padding-top: 20px;
     margin-top: 0;
-    height: 110vh;
+    height: 88vh;
     position: absolute;
     transition: all 0.3s ease;
 }
@@ -100,9 +100,10 @@
     font-size: 18px;
 }
 
-.sidebar ul li:nth-child(2) a {
+.sidebar ul li:nth-child(4) a {
     background-color: #053ec9;
     width: 85%;
+    font-size: 18px;
 }
 
     /* Table */
@@ -192,7 +193,6 @@
     a {
         cursor: pointer;
     }
-
     .btn-add:hover,
     .btn-add:focus {
         transform: scale(1.01);

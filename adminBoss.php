@@ -18,7 +18,7 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boss Management</title>
-    <link rel="stylesheet" href="layout/adminUser.css">
+    <link rel="stylesheet" href="layout/adminBoss.css">
 </head>
 <body>
     <!-- Header Section -->
@@ -40,6 +40,9 @@ $result = $conn->query($sql);
             <li><a href="adminCar.php">Manage Cars</a></li>
             <li><a href="adminBoss.php">Manage Boss</a></li>
             <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
     </div>
 

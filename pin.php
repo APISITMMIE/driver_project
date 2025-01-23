@@ -141,6 +141,8 @@ if (isset($_GET['taskId'])) {
                 </div>
             </div>
         </div>
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
 
         <!-- ปุ่ม Home -->
         <button class="home-button" onclick="window.location.href='tasklist.php'">Home</button>
@@ -148,7 +150,6 @@ if (isset($_GET['taskId'])) {
     </div>
 
     <script>
-        let correctPin = ""; 
         let btns = document.getElementsByClassName("pinpad-btn");
         let pinInput = document.getElementById("pinpad-input");
 
@@ -168,7 +169,7 @@ if (isset($_GET['taskId'])) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Please enter a PIN',
-                    text: 'You need to provide a PIN to continue!',
+                    text: 'You need to enter a PIN to continue!',
                 });
             } else {
                 let pinEntered = pinInput.value;
@@ -178,38 +179,17 @@ if (isset($_GET['taskId'])) {
                     data: { pin: pinEntered, taskId: <?php echo $taskId; ?> },
                     success: function(response) {
                         let [type, value] = response.trim().split('|');
-                        if (type === "boss" || type === "user" || type === "pin") {
+                        if (type === "boss" || type === "pin") {
                             Swal.fire({
-                                title: `Are you : ${value}?`,
+                                title: `You are ${value}`,
+                                text: 'Is this correct?',
                                 icon: 'question',
                                 showCancelButton: true,
                                 confirmButtonText: 'Yes',
                                 cancelButtonText: 'No',
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    $.ajax({
-                                        url: 'save_pin.php',
-                                        type: 'POST',
-                                        data: { pin: pinEntered },
-                                        success: function(saveResponse) {
-                                            if (saveResponse.trim() === "success") {
-                                                proceedToNextPage(pinEntered);
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: 'Error',
-                                                    text: 'Failed to save PIN. Please try again.',
-                                                });
-                                            }
-                                        },
-                                        error: function() {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error',
-                                                text: 'An error occurred while saving the PIN.',
-                                            });
-                                        }
-                                    });
+                                    saveLocationToDatabase(pinEntered);
                                 } else {
                                     pinInput.value = ""; 
                                 }
@@ -230,18 +210,89 @@ if (isset($_GET['taskId'])) {
                         });
                     }
                 });
+                getLocation();
             }
         });
+
+        function saveLocationToDatabase(pinEntered) {
+            let latitude = document.getElementById("latitude").value || "0";
+            let longitude = document.getElementById("longitude").value || "0";
+
+            $.ajax({
+                url: 'save_location.php',
+                type: 'POST',
+                data: {
+                    taskId: <?php echo $taskId; ?>,
+                    latitude: latitude,
+                    longitude: longitude
+                },
+                success: function(response) {
+                    if (response.trim() === "success") {
+                        proceedToNextPage(pinEntered);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to save location data.',
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while saving the location data. Please try again.',
+                    });
+                }
+            });
+        }
 
         function proceedToNextPage(pinEntered) {
             let endTime = new Date().toLocaleTimeString('en-GB', { hour12: false });
             window.location.href = `destination.php?taskId=<?php echo $taskId; ?>&pin=${pinEntered}&end_time=${endTime}`;
         }
 
+
         delBtn.addEventListener("click", () => {
             if (pinInput.value)
                 pinInput.value = pinInput.value.substr(0, pinInput.value.length - 1);
         });
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            document.getElementById("latitude").value = latitude;
+            document.getElementById("longitude").value = longitude;
+
+        }
+
+        function showError(error) {
+            let errorMessage = "";
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = "An unknown error occurred.";
+                    break;
+            }
+            alert(errorMessage);
+        }
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

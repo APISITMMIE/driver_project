@@ -19,7 +19,7 @@ $result_show = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Management</title>
-    <link rel="stylesheet" href="layout/adminUser.css">
+    <link rel="stylesheet" href="layout/adminCar.css">
 </head>
 <body>
     <!-- Header Section -->
@@ -41,6 +41,9 @@ $result_show = $conn->query($sql);
             <li><a href="adminCar.php">Manage Cars</a></li>
             <li><a href="adminBoss.php">Manage Boss</a></li>
             <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
     </div>
 
@@ -65,7 +68,11 @@ $result_show = $conn->query($sql);
                 <?php
                     if ($result_show->num_rows > 0) {
                         while ($row = $result_show->fetch_assoc()) {
-                            $statusText = $row['carStatus'] == 1 ? "พร้อมใช้งาน" : "ไม่พร้อมใช้งาน";
+                            if ($row['carStatus'] == 1){
+                                $statusText = "<span style='colr: green'>พร้อมใช้งาน</span>";
+                            } else {
+                                $statusText = "<span style='color: red'>ไม่พร้อมใช้งาน</span>";
+                            }
                             echo "
                             <tr>
                                 <td>" . ($row["carId"]) . "</td>

@@ -73,12 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
+        .table-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
         form {
             background-color: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 400px;
+            width: 35%;
             margin: auto;
         }
         form label {
@@ -139,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .eye-icon:hover {
             color: #007bff;
         }
+
         .headna {
             display: flex;
             flex-direction: column;
@@ -146,6 +154,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             justify-content: center;
             text-align: center;
         }
+
+        .back-btn {
+            margin-top: 20px;
+            width: 35%;
+            padding: 12px;
+            background-color: transparent;
+            color: #929191;
+            padding: 12px 20px;
+            border: 1px solid #929191 ;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .back-btn:hover {
+            background-color: #929191;
+            color: white;
+        }
+        
     </style>
 </head>
 <body>
@@ -169,6 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <li><a href="adminCar.php">Manage Cars</a></li>
             <li><a href="adminBoss.php">Manage Boss</a></li>
             <li><a href="report.php">Reports</a></li>
+            <li><a href="report_boss.php">Report Boss</a></li>
+            <li><a href="report_driver.php">Report Diver</a></li>
+            <li><a href="weekly_report.php">Weekly Report</a></li>
         </ul>
     </div>
 
@@ -202,6 +232,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <button type="submit">Update</button>
         </form>
+        <button onclick="history.back()" class="back-btn">Back</button>
     </div>
 
     <script>
