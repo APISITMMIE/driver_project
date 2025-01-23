@@ -1,9 +1,9 @@
 <?php
-$serverName = "BMT03\BMTSQLSERVER";   
-$database = "BMT_MASTER";  
+$serverName =;   
+$database = ;  
  
-$uid = "sa";  
-$pwd = "Thchsusi2012";  
+$uid = ;  
+$pwd = ;  
 
 try {  
    $conn2 = new PDO( "sqlsrv:server=$serverName;Database = $database", $uid, $pwd);   
